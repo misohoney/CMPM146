@@ -4,12 +4,13 @@ from heapq import heappush, heappop
 
 def dijkstras_shortest_path(src, dst, graph, adj):
 
-	dist = [] #record the distance from source to source
-	prev = []
-	distance = 0
-	dist[src] = 0
+	dist = {} #record the distance from source to source
+	prev = {}
+	alt = 0
+	dist[src] = alt
 	prev[src] = None
-	queue = [src]
+	queue = []
+	heappush(queue, src)
 
 	while queue:
 		node = heappop(queue) #source node in first case
@@ -18,31 +19,17 @@ def dijkstras_shortest_path(src, dst, graph, adj):
 			break
 
 		neighbors = adj(graph, node)
-		for curNeighor in neighbors:
+		for curNeighbor in neighbors:
 			x, y = node #current coordinate of current node
 			dx, dy = curNeighbor # current coordinate of current neighbor
-			if curNeighbor not in prev: #make sure we're not going backward
-				#calculate distance from current node to current neighbor
-				alt = sqrt((x+dx)*(x+dx)+(y+dy)*(y+dy)) + dist[node] 
-				if curNeighbor not in dist or alt < dist(curNeighbor)
-					or alt < dist.get(curNeighbor, alt+1)
-
-					dist[curNeighbor] = alt
+		
+			#calculate distance from current node to current neighbor
+			alt = sqrt(((x-dx)*(x-dx))+((y-dy)*(y-dy))) + dist[node] 
+			if curNeighbor not in dist or alt < dist[curNeighbor]:
+				dist[curNeighbor] = alt
+				prev[curNeighbor] = node
+				heappush(queue, curNeighbor)
 					
-
-
-
-
-					#prev[next_node] = node
-
-
-
-
-
-
-				#prev[next_node] = node
-				#stack.append(next_node)
-
 	if node == dst:
 		path = []
 		while node:
@@ -55,7 +42,7 @@ def dijkstras_shortest_path(src, dst, graph, adj):
 
 #to return all the neighbors of current node
 def navigation_edges(level, cell): 
-    neighbors = [] #to record all the neighbor nodes
+	adj = [] #to record all the neighbor nodes
 	x, y = cell
 	for dx in [-1,0,1]:
 		for dy in [-1,0,1]:
@@ -64,12 +51,12 @@ def navigation_edges(level, cell):
 			#if distance from current node to neighbor node is greater than 0
 			#and is a dot/space, then append nextcell to neighbors[]
 			if distance > 0 and next_cell in level['spaces']: 
-				neighbors.append(next_cell)
+				adj.append(next_cell)
 			#if distance from current node to neighbor node is greater than 0
 			#and is a way point, then append nextcell to neighbors[]
 			elif distance > 0 and next_cell in level['waypoints']:
-				neighbors.append(next_cell)
-	return neighbors
+				adj.append(next_cell)
+	return adj
 
 def test_route(filename, src_waypoint, dst_waypoint):
 	level = load_level(filename)
