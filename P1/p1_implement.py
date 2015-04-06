@@ -3,32 +3,24 @@ from math import sqrt
 from heapq import heappush, heappop
 
 def dijkstras_shortest_path(src, dst, graph, adj):
-  	dist = {}
+
+	dist = {}
 	prev = {}
-
-	distance = 0
-	dist[src] = distance
+	distance = 0;
 	prev[src] = None
-	queue = []
-	heappush(queue, src)
+	stack = [src]
 
-	while queue:
-		node = heappop(queue)
-		
+	while stack:
+		node = stack.pop()
+
 		if node == dst:
 			break
 
 		neighbors = adj(graph, node)
 		for next_node in neighbors:
-			x1, y1 = node
-			x2, y2 = next_node
-			dx = x2 - x1
-			dy = y2 - y1
-			distance = dist[node] + sqrt(dx*dx+dy*dy)
-			if next_node not in dist or distance < dist[next_node]:
-				dist[next_node] = distance
+			if next_node not in prev:
 				prev[next_node] = node
-				heappush(queue, next_node)
+				stack.append(next_node)
 
 	if node == dst:
 		path = []
@@ -39,21 +31,23 @@ def dijkstras_shortest_path(src, dst, graph, adj):
 		return path
 	else:
 		return []
-	
 
-
-def navigation_edges(level, cell):
-  adj = []
+#to return all the neighbors of current node
+def navigation_edges(level, cell): 
+    adj = [] #to record all the neighbor nodes
 	x, y = cell
 	for dx in [-1,0,1]:
 		for dy in [-1,0,1]:
 			next_cell = (x + dx, y + dy)
 			dist = sqrt(dx*dx+dy*dy)
-			if dist > 0 and next_cell in level['spaces']:
+			#if distance from current node to neighbor node is greater than 0
+			#and is a dot/space, then append nextcell to adj[]
+			if dist > 0 and next_cell in level['spaces']: 
 				adj.append(next_cell)
+			#if distance from current node to neighbor node is greater than 0
+			#and is a way point, then append nextcell to adj[]
 			elif dist > 0 and next_cell in level['waypoints']:
 				adj.append(next_cell)
-
 	return adj
 
 def test_route(filename, src_waypoint, dst_waypoint):

@@ -4,10 +4,11 @@ from math import sqrt
 
 def dfs(src, dst, graph, adj):
 	
-	prev = {}
-
+	distance = 0;
+	
+	dist[src] = distance;
 	prev[src] = None
-	stack = [src]
+	queue = [src]
 
 	while stack:
 		node = stack.pop()
